@@ -7,26 +7,31 @@ services:
       - "8300:8300"
       - "8400:8400"
       - "8500:8500"
-    links:
-      - gin-web-01
-      - gin-web-02
     networks:
       - sky-net
 
-  gin-web-01:
-    image: gin-web
+  simple-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    image: simple-server
     environment:
-    - PORT=8080
-    ports:
-    - "8080:8080"
+      - CONSUL_HTTP_ADDR=consul:8500
+    depends_on:
+      - consul
     networks:
       - sky-net
-  gin-web-02:
-    image: gin-web
+
+  simple-client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    image: simple-client
     environment:
-    - PORT=9090
-    ports:
-    - "9090:9090"
+      - CONSUL_HTTP_ADDR=consul:8500
+    depends_on:
+      - consul
+      - simple-server
     networks:
       - sky-net
 
